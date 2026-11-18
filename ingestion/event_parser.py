@@ -23,17 +23,17 @@ def parse_market_trade(message):
 
             normalised_trade={
                 "trade_id":(
-                    str(trade.get["trade_id"])
+                    str(trade.get("trade_id"))
                     if trade.get("trade_id") is not None
                     else None
                     ),
                 "product_id":trade.get("product_id"),
                 "price":trade.get("price"),
-                "quantity":trade.get("quantity"),
+                "quantity":trade.get("size"),
                 "side":trade.get("side"),
                 "trade_time":trade.get("time")     
             }
 
             normalised_trades.append(normalised_trade)
 
-        return normalised_trades
+    return normalised_trades
