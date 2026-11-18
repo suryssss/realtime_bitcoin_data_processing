@@ -4,7 +4,7 @@ import websockets
 
 from event_parser import parse_market_trade
 from validator import validate_trade 
-from producer import create_producer, publish_trade
+from producer import create_producer, publish_trade , create_avro_serializer
 
 WS_URL = "wss://advanced-trade-ws.coinbase.com"
 PRODUCT_IDS = ["BTC-USD"]
@@ -39,7 +39,7 @@ async def connect_to_coinbase(producer):
                             print("\nValid Trade:")
                             print(json.dumps(trade, indent=4))
                             try:
-                                publish_trade(producer, trade)
+                                publish_trade(producer, avro_serializer ,trade)
                             except Exception as pe:
                                 print(f"Error publishing to Kafka: {pe}")
                         else:
@@ -56,11 +56,14 @@ async def connect_to_coinbase(producer):
 
 if __name__ == "__main__":
     producer = create_producer()
+    avro_serializer=create_avro_serializer()
     try:
         asyncio.run(connect_to_coinbase(producer))
     except KeyboardInterrupt:
         print("\nStopping websocket client...")
     finally:
-        print("Flushing Kafka producer...")
-        producer.flush(10)
-        print("Done.")
+        remaining=producer.flush(10)
+        if remaining:
+            print(f"{remaining} messages were not delivered")
+        else:
+            print("All pending messaged delivered")
