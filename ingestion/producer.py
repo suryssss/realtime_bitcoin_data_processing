@@ -2,40 +2,29 @@ import os
 import json 
 from datetime import datetime, timezone
 
+from pathlib import Path
 from confluent_kafka import Producer
 
 from dotenv import load_dotenv
 
-load_dotenv()
-
-config ={
-     "bootstrap.servers": os.getenv("BOOTSTRAP_SERVERS"),
-    "security.protocol": "SASL_SSL",
-    "sasl.mechanism": "PLAIN",
-    "sasl.username": os.getenv("KAFKA_API_KEY"),
-    "sasl.password": os.getenv("KAFKA_API_SECRET"),
-    "client.id": "marketpulse-python-producer"
-}
+BASE_DIR=Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR/ ".env")
 
 #keys check
 
-bootstrap = os.getenv("BOOTSTRAP_SERVERS")
-api_key = os.getenv("KAFKA_API_KEY")
-api_secret = os.getenv("KAFKA_API_SECRET")
-print("Bootstrap Server:", bool(bootstrap))
-print("API Key Loaded:", bool(api_key))
-print("API Secret Loaded:", bool(api_secret))
-
-
-#initialze producer
-
-producer=Producer(config)
+if __name__ == "__main__":
+    bootstrap = os.getenv("BOOTSTRAP_SERVERS")
+    api_key = os.getenv("KAFKA_API_KEY")
+    api_secret = os.getenv("KAFKA_API_SECRET")
+    print("Bootstrap Server:", bool(bootstrap))
+    print("API Key Loaded:", bool(api_key))
+    print("API Secret Loaded:", bool(api_secret))
 
 #delivery callback
 
 def delivery_report(err,msg):
     if err is not None:
-        print(f"Delivate failed:{err}")
+        print(f"Delivery failed:{err}")
 
     else:
         print(
@@ -44,32 +33,27 @@ def delivery_report(err,msg):
             f"Partition:{msg.partition()} |"
             f"Offset:{msg.offset()}"
         )
+#creating a producer
 
-#sample trade event
+def create_producer():
+    config ={
+        "bootstrap.servers": os.getenv("BOOTSTRAP_SERVERS"),
+        "security.protocol": "SASL_SSL",
+        "sasl.mechanism": "PLAIN",
+        "sasl.username": os.getenv("KAFKA_API_KEY"),
+        "sasl.password": os.getenv("KAFKA_API_SECRET"),
+        "client.id": "marketpulse-python-producer"
+        }
 
-trade={
-    "trade_id":"trade_001",
-    "produce_id":"BTC_USD",
-    "price":"950000.50",
-    "quantity":"0.025",
-    "side":"BUY",
-    "trade_time":datetime.now(timezone.utc).isoformat()
-}
+    return Producer(config)
 
-#publish message
+def publish_trade(producer,trade):
+    producer.produce(
+        topic="trades.raw",
+        key=trade["product_id"],
+        value=json.dumps(trade),
+        callback=delivery_report
+    )
 
-# Publish message
-producer.produce(
-    topic="trades.raw",
-    key=trade["produce_id"],
-    value=json.dumps(trade),
-    callback=delivery_report
-)
-
-# Wait for delivery
-remaining = producer.flush(timeout=10)
-
-if remaining == 0:
-    print("All messages delivered successfully.")
-else:
-    print(f"WARNING: {remaining} messages were not delivered.")
+    #serve delivery callbacks
+    producer.poll(0)
