@@ -27,6 +27,11 @@
     {
       "name": "trade_time",
       "type": "string"
+    },
+    {
+        "name":"exchange",
+        "type":["null","string"],
+        "default":null
     }
   ]
 }

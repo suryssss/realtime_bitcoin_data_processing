@@ -31,7 +31,8 @@ def parse_market_trade(message):
                 "price":trade.get("price"),
                 "quantity":trade.get("size"),
                 "side":trade.get("side"),
-                "trade_time":trade.get("time")     
+                "trade_time":trade.get("time"),
+                "exchange":"COINBASE"     
             }
 
             normalised_trades.append(normalised_trade)
