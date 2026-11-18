@@ -1,0 +1,32 @@
+{
+  "type": "record",
+  "name": "Trade",
+  "namespace": "io.marketpulse",
+  "doc": "Normalized Coinbase market trade event",
+  "fields": [
+    {
+      "name": "trade_id",
+      "type": "string"
+    },
+    {
+      "name": "product_id",
+      "type": "string"
+    },
+    {
+      "name": "price",
+      "type": "string"
+    },
+    {
+      "name": "quantity",
+      "type": "string"
+    },
+    {
+      "name": "side",
+      "type": "string"
+    },
+    {
+      "name": "trade_time",
+      "type": "string"
+    }
+  ]
+}
