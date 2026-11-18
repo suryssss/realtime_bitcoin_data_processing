@@ -3,6 +3,7 @@ import json
 import websockets
 
 from event_parser import parse_market_trade
+from validator import validate_trade 
 
 #endpoint to connect to coinbase 
 WS_URL = "wss://advanced-trade-ws.coinbase.com"
@@ -43,8 +44,16 @@ async def connect_to_coinbase():
             trades=parse_market_trade(message)
 
             for trade in trades:
-                print("\nNew Trade Received")
-                print(json.dumps(trade,indent=4))
+                is_valid,errors=validate_trade(trade)
+
+                if is_valid:
+                    print("\nValid Trade")
+
+                    print(json.dumps(trade,indent=4))
+                else:
+                    print("\nInvalid Trade")
+                    print(trade)
+                    print("Errors :",errors)
 
 
 if __name__=="__main__":
