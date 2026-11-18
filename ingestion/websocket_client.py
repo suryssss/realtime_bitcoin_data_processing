@@ -2,6 +2,8 @@ import asyncio
 import json
 import websockets
 
+from event_parser import parse_market_trade
+
 #endpoint to connect to coinbase 
 WS_URL = "wss://advanced-trade-ws.coinbase.com"
 
@@ -38,8 +40,11 @@ async def connect_to_coinbase():
 
         #receive incoming messages
         async for message in websocket:
-            data =json.loads(message)
-            print(json.dumps(data,indent=4))
+            trades=parse_market_trade(message)
+
+            for trade in trades:
+                print("\nNew Trade Received")
+                print(json.dumps(trade,indent=4))
 
 
 if __name__=="__main__":
