@@ -8,6 +8,7 @@ resources:
       schema: ${var.schema}
       serverless: true
       root_path: "../src/marketpulse_databricks_etl"
+      continuous: true
 
       libraries:
         - glob:

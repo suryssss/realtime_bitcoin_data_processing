@@ -1,0 +1,77 @@
+name: "Deploy & Run Databricks ETL Pipeline"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "marketpulse_databricks/**"
+      - ".github/workflows/databricks_deploy.yml"
+
+  # Allows manual execution from the GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Target environment to deploy to"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - prod
+      run_pipeline:
+        description: "Trigger pipeline execution after deploy?"
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  deploy-and-run:
+    name: "Deploy to Databricks"
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: marketpulse_databricks
+
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+    steps:
+      # 1. Checkout repository code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Install UV (used for building Python wheel artifacts in databricks.yml)
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      # 3. Setup official Databricks CLI
+      - name: Setup Databricks CLI
+        uses: databricks/setup-cli@main
+
+      # 4. Validate the Databricks Asset Bundle
+      - name: Validate Bundle
+        run: |
+          TARGET="${{ github.event.inputs.target || 'dev' }}"
+          echo "Validating bundle for target: $TARGET"
+          databricks bundle validate --target "$TARGET"
+
+      # 5. Deploy Bundle
+      - name: Deploy Bundle
+        run: |
+          TARGET="${{ github.event.inputs.target || 'dev' }}"
+          echo "Deploying bundle to target: $TARGET"
+          databricks bundle deploy --target "$TARGET"
+
+      # 6. Run the Lakeflow ETL Pipeline
+      - name: Run Lakeflow Pipeline
+        if: ${{ github.event_name == 'push' || github.event.inputs.run_pipeline == true }}
+        run: |
+          TARGET="${{ github.event.inputs.target || 'dev' }}"
+          echo "Triggering Lakeflow Pipeline on target: $TARGET"
+          databricks bundle run marketpulse_databricks_etl --target "$TARGET"
+
