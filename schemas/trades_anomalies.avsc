@@ -1,0 +1,80 @@
+{
+  "type": "record",
+  "name": "trades_anomalies_sink_value",
+  "namespace": "org.apache.flink.avro.generated.record",
+  "fields": [
+    {
+      "name": "trade_id",
+      "type": ["null", "string"],
+      "default": null
+    },
+    {
+      "name": "product_id",
+      "type": ["null", "string"],
+      "default": null
+    },
+    {
+      "name": "trade_time",
+      "type": ["null", "string"],
+      "default": null
+    },
+    {
+      "name": "price",
+      "type": [
+        "null",
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 20,
+          "scale": 8
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "quantity",
+      "type": [
+        "null",
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 20,
+          "scale": 12
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "trade_value",
+      "type": [
+        "null",
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 20,
+          "scale": 8
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "anomaly_type",
+      "type": ["null", "string"],
+      "default": null
+    },
+    {
+      "name": "threshold",
+      "type": [
+        "null",
+        {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 20,
+          "scale": 8
+        }
+      ],
+      "default": null
+    }
+  ]
+}
+

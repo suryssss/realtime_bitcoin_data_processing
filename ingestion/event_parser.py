@@ -1,5 +1,11 @@
 import json 
+from datetime import datetime,timezone
 
+def normalize_timestamp(timestamp):
+    parsed_time = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+    parsed_time = parsed_time.astimezone(timezone.utc)
+
+    return parsed_time.isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 def parse_market_trade(message):
     
@@ -31,7 +37,7 @@ def parse_market_trade(message):
                 "price":trade.get("price"),
                 "quantity":trade.get("size"),
                 "side":trade.get("side"),
-                "trade_time":trade.get("time"),
+                "trade_time": normalize_timestamp(trade.get("time")),
                 "exchange":"COINBASE"     
             }
 
