@@ -1,0 +1,16 @@
+resources:
+  jobs:
+    marketpulse_etl_job:
+      name: "[${bundle.target}] marketpulse_etl_job"
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+
+      tasks:
+        - task_key: refresh_marketpulse_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.marketpulse_databricks_etl.id}
+

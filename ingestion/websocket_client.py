@@ -1,17 +1,23 @@
 import asyncio
 import json
+import os
+from pathlib import Path
 import websockets
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 from event_parser import parse_market_trade
-from validator import validate_trade
+from validator import validate_trade, get_supported_products
 from producer import (
     create_producer,
     publish_trade,
     create_avro_serializer
 )
 
-WS_URL = "wss://advanced-trade-ws.coinbase.com"
-PRODUCT_IDS = ["BTC-USD"]
+WS_URL = os.getenv("COINBASE_WS_URL", "wss://advanced-trade-ws.coinbase.com")
+PRODUCT_IDS = sorted(list(get_supported_products()))
 
 INITIAL_RETRY_DELAY = 1
 MAX_RETRY_DELAY = 60

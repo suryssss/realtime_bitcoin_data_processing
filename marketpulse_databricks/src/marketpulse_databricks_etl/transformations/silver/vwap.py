@@ -20,7 +20,12 @@ VWAP_AVRO_SCHEMA = """{
 
 @dp.table(
     name="silver.vwap",
-    table_properties={"quality": "silver"}
+    table_properties={
+        "quality": "silver",
+        "delta.autoOptimize.optimizeWrite": "true",
+        "delta.autoOptimize.autoCompact": "true"
+    },
+    cluster_by=["product_id", "window_start"]
 )
 # Data Quality Expectations for 5-minute VWAP
 @dp.expect_or_drop("valid_product_id", "product_id IS NOT NULL AND length(trim(product_id)) > 0")

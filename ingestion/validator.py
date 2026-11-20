@@ -10,15 +10,29 @@ rules:
     trade_time: valid ISO 8601 timestamp with timezone
 '''
 
+import os
+from pathlib import Path
 from decimal import Decimal, InvalidOperation
 from datetime import datetime
+from dotenv import load_dotenv
 
-VALID_PRODUCTS = {"BTC-USD"}
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
+
+
+def get_supported_products():
+    """Load supported cryptocurrency pairs from environment or fallback to BTC-USD."""
+    env_products = os.getenv("PRODUCTS") or os.getenv("PRODUCT_IDS", "BTC-USD")
+    return {p.strip().upper() for p in env_products.split(",") if p.strip()}
+
+
+VALID_PRODUCTS = get_supported_products()
 VALID_SIDES = {"BUY", "SELL"}
 
 
-def validate_trade(trade):
+def validate_trade(trade, allowed_products=None):
     errors = []
+    supported_products = allowed_products if allowed_products is not None else get_supported_products()
 
     # 1. Validate trade_id
     trade_id = trade.get("trade_id")
@@ -27,8 +41,8 @@ def validate_trade(trade):
 
     # 2. Validate product_id
     product_id = trade.get("product_id")
-    if product_id not in VALID_PRODUCTS:
-        errors.append("Unsupported product_id")
+    if product_id not in supported_products:
+        errors.append(f"Unsupported product_id: {product_id}")
 
     # 3. Validate price
     try:

@@ -253,9 +253,15 @@ marketpulse/
 ### Step 1: Configure Ingestion Credentials
 Create a `.env` file in the root directory:
 ```bash
+# Supported Pairs (comma-separated)
+PRODUCTS=BTC-USD,ETH-USD,SOL-USD
+
+# Confluent Cloud Kafka
 BOOTSTRAP_SERVERS=pkc-xxxxx.us-east-2.aws.confluent.cloud:9092
 KAFKA_API_KEY=YOUR_KAFKA_KEY
 KAFKA_API_SECRET=YOUR_KAFKA_SECRET
+
+# Schema Registry
 SCHEMA_REGISTRY_URL=https://psrc-xxxxx.us-east-2.aws.confluent.cloud
 SCHEMA_REGISTRY_API_KEY=YOUR_SR_KEY
 SCHEMA_REGISTRY_API_SECRET=YOUR_SR_SECRET
@@ -270,21 +276,36 @@ databricks secrets put-secret marketpulse kafka_api_key --string-value "YOUR_KAF
 databricks secrets put-secret marketpulse kafka_api_secret --string-value "YOUR_KAFKA_SECRET"
 ```
 
-### Step 3: Run Ingestion
+### Step 3: Run Unit Tests
+Verify data validation and multi-product parsing:
+```bash
+python -m unittest marketpulse_databricks/tests/test_validator.py
+```
+
+### Step 4: Run Ingestion Engine
+
+#### Option A: Native Python
 ```bash
 pip install -r requirements.txt
 python ingestion/websocket_client.py
 ```
 
-### Step 4: Deploy and Run Databricks Lakeflow Pipeline
+#### Option B: Docker Container (Recommended for Production)
+```bash
+docker compose up -d
+# Check logs
+docker compose logs -f
+```
+
+### Step 5: Deploy and Run Databricks Lakeflow Pipeline
 ```bash
 cd marketpulse_databricks
 
 # Deploy the bundle to the development environment
 databricks bundle deploy --target dev
 
-# Trigger the Lakeflow Pipeline
-databricks bundle run marketpulse_databricks_etl
+# Trigger the Lakeflow Pipeline (use --full-refresh if applying new Liquid Clustering definitions)
+databricks bundle run marketpulse_databricks_etl --full-refresh
 ```
 
 ---

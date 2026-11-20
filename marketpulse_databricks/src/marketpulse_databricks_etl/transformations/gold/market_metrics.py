@@ -16,7 +16,12 @@ from pyspark.sql.functions import (
 
 @dp.materialized_view(
     name="gold.market_metrics",
-    table_properties={"quality": "gold"}
+    table_properties={
+        "quality": "gold",
+        "delta.autoOptimize.optimizeWrite": "true",
+        "delta.autoOptimize.autoCompact": "true"
+    },
+    cluster_by=["product_id", "window_start"]
 )
 def market_metrics():
 

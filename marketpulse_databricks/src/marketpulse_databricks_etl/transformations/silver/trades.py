@@ -21,7 +21,12 @@ TRADE_AVRO_SCHEMA = """{
 
 @dp.table(
     name="silver.trades",
-    table_properties={"quality": "silver"}
+    table_properties={
+        "quality": "silver",
+        "delta.autoOptimize.optimizeWrite": "true",
+        "delta.autoOptimize.autoCompact": "true"
+    },
+    cluster_by=["product_id", "trade_time"]
 )
 # Data Quality Expectations: Invalid or unparseable records are dropped and logged in DLT metrics
 @dp.expect_or_drop("valid_trade_id", "trade_id IS NOT NULL AND length(trim(trade_id)) > 0")
