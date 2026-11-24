@@ -1,0 +1,12 @@
+resources:
+  apps:
+    marketpulse_crypto_app:
+      name: "marketpulse-crypto-dashboard"
+      description: "Real-time Crypto Lakehouse Intelligence Dashboard (Streamlit & Plotly)"
+      source_code_path: "../app"
+      resources:
+        - name: "sql-warehouse"
+          sql_warehouse:
+            id: "c45421db6f944f52"
+            permission: "CAN_USE"
+

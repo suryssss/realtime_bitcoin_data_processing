@@ -1,0 +1,11 @@
+command: [
+  "streamlit",
+  "run",
+  "app.py"
+]
+env:
+  - name: DATABRICKS_CATALOG
+    value: "marketpulse"
+  - name: DATABRICKS_HTTP_PATH
+    value: "/sql/1.0/warehouses/c45421db6f944f52"
+

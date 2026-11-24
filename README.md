@@ -308,6 +308,16 @@ databricks bundle deploy --target dev
 databricks bundle run marketpulse_databricks_etl --full-refresh
 ```
 
+### Step 6: Deploy Databricks App (Interactive Streamlit UI)
+Deploy the native interactive Streamlit dashboard directly to your Databricks workspace:
+```bash
+cd marketpulse_databricks
+
+# Deploy via Databricks Asset Bundle (includes Lakeflow Pipeline + App)
+databricks bundle deploy --target dev
+```
+Once deployed, open **Compute** $\rightarrow$ **Apps** $\rightarrow$ **marketpulse-crypto-dashboard** in the Databricks UI to launch the live app.
+
 ---
 
 ## 7. Databricks AI/BI Dashboards
